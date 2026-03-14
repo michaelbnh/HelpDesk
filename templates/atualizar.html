@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atualizar Chamado - Helpdesk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✏️ Atualizar Chamado #{{ chamado.id }}</h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Início</a></li>
+                    <li><a href="{{ url_for('listar_chamados') }}">Ver Chamados</a></li>
+                    <li><a href="{{ url_for('abrir_chamado') }}">Abrir Chamado</a></li>
+                    <li><a href="{{ url_for('estatisticas') }}">Estatísticas</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="chamado-form">
+                <div class="form-section">
+                    <h3>📋 Informações do Chamado</h3>
+                    
+                    <div class="form-group">
+                        <label for="titulo">Título do Chamado *</label>
+                        <input type="text" id="titulo" name="titulo" 
+                               value="{{ chamado.titulo }}" required
+                               maxlength="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descricao">Descrição Detalhada *</label>
+                        <textarea id="descricao" name="descricao" rows="5" required
+                                  maxlength="1000">{{ chamado.descricao }}</textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoria">Categoria *</label>
+                            <select id="categoria" name="categoria" required>
+                                <option value="Hardware" {% if chamado.categoria == 'Hardware' %}selected{% endif %}>🖥️ Hardware</option>
+                                <option value="Software" {% if chamado.categoria == 'Software' %}selected{% endif %}>💿 Software</option>
+                                <option value="Rede" {% if chamado.categoria == 'Rede' %}selected{% endif %}>🌐 Rede</option>
+                                <option value="Email" {% if chamado.categoria == 'Email' %}selected{% endif %}>📧 Email</option>
+                                <option value="Impressora" {% if chamado.categoria == 'Impressora' %}selected{% endif %}>🖨️ Impressora</option>
+                                <option value="Acesso" {% if chamado.categoria == 'Acesso' %}selected{% endif %}>🔑 Acesso/Permissão</option>
+                                <option value="Outro" {% if chamado.categoria == 'Outro' %}selected{% endif %}>❓ Outro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prioridade">Prioridade *</label>
+                            <select id="prioridade" name="prioridade" required>
+                                <option value="Baixa" {% if chamado.prioridade == 'Baixa' %}selected{% endif %}>🟢 Baixa</option>
+                                <option value="Média" {% if chamado.prioridade == 'Média' %}selected{% endif %}>🟡 Média</option>
+                                <option value="Alta" {% if chamado.prioridade == 'Alta' %}selected{% endif %}>🟠 Alta</option>
+                                <option value="Crítica" {% if chamado.prioridade == 'Crítica' %}selected{% endif %}>🔴 Crítica</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select id="status" name="status" required>
+                            <option value="Aberto" {% if chamado.status == 'Aberto' %}selected{% endif %}>📌 Aberto</option>
+                            <option value="Em Andamento" {% if chamado.status == 'Em Andamento' %}selected{% endif %}>⚙️ Em Andamento</option>
+                            <option value="Aguardando" {% if chamado.status == 'Aguardando' %}selected{% endif %}>⏳ Aguardando</option>
+                            <option value="Resolvido" {% if chamado.status == 'Resolvido' %}selected{% endif %}>✅ Resolvido</option>
+                            <option value="Fechado" {% if chamado.status == 'Fechado' %}selected{% endif %}>🔒 Fechado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>👤 Dados do Solicitante</h3>
+                    
+                    <div class="form-group">
+                        <label for="aberto_por">Nome do Solicitante *</label>
+                        <input type="text" id="aberto_por" name="aberto_por" 
+                               value="{{ chamado.aberto_por }}" required
+                               maxlength="100">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email_contato">E-mail para contato</label>
+                            <input type="email" id="email_contato" name="email_contato" 
+                                   value="{{ chamado.email_contato or '' }}"
+                                   placeholder="email@exemplo.com"
+                                   maxlength="100">
+                            <small>Opcional, mas recomendado</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefone_contato">Telefone para contato</label>
+                            <input type="tel" id="telefone_contato" name="telefone_contato" 
+                                   value="{{ chamado.telefone_contato or '' }}"
+                                   placeholder="(11) 99999-9999"
+                                   maxlength="20">
+                            <small>Opcional</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">💾 Salvar Alterações</button>
+                    <a href="{{ url_for('listar_chamados') }}" class="btn btn-secondary">↩️ Cancelar</a>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        // Máscara para telefone
+        document.getElementById('telefone_contato').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 10) {
+                value = value.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            } else if (value.length > 5) {
+                value = value.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+            } else if (value.length > 2) {
+                value = value.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+            }
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

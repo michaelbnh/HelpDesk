@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Chamado - Helpdesk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Detalhes do Chamado #{{ chamado.id }}</h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Início</a></li>
+                    <li><a href="{{ url_for('listar_chamados') }}">Ver Chamados</a></li>
+                    <li><a href="{{ url_for('abrir_chamado') }}">Abrir Chamado</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <div class="chamado-detalhes">
+                <div class="detalhes-header">
+                    <h2>{{ chamado.titulo }}</h2>
+                    <div class="status-info">
+                        <span class="badge prioridade-{{ chamado.prioridade.lower() }}">
+                            Prioridade: {{ chamado.prioridade }}
+                        </span>
+                        <span class="badge status-{{ chamado.status.lower() }}">
+                            Status: {{ chamado.status }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Categoria:</strong>
+                        <p>{{ chamado.categoria }}</p>
+                    </div>
+                    <div class="info-item">
+                        <strong>Data de Abertura:</strong>
+                        <p>{{ chamado.data_abertura }}</p>
+                    </div>
+                    <div class="info-item">
+                        <strong>Última Atualização:</strong>
+                        <p>{{ chamado.data_atualizacao }}</p>
+                    </div>
+                </div>
+
+                <div class="descricao">
+                    <h3>Descrição do Problema:</h3>
+                    <p>{{ chamado.descricao }}</p>
+                </div>
+
+                <div class="detalhes-actions">
+                    <a href="{{ url_for('atualizar_chamado', id=chamado.id) }}" class="btn">Editar Chamado</a>
+                    <a href="{{ url_for('listar_chamados') }}" class="btn btn-secondary">Voltar</a>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abrir Chamado - Helpdesk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Abrir Novo Chamado</h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Início</a></li>
+                    <li><a href="{{ url_for('listar_chamados') }}">Ver Chamados</a></li>
+                    <li><a href="{{ url_for('abrir_chamado') }}" class="active">Abrir Chamado</a></li>
+                    <li><a href="{{ url_for('estatisticas') }}">Estatísticas</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="chamado-form">
+                <div class="form-section">
+                    <h3>📋 Informações do Chamado</h3>
+                    
+                    <div class="form-group">
+                        <label for="titulo">Título do Chamado *</label>
+                        <input type="text" id="titulo" name="titulo" required 
+                               placeholder="Digite um título descritivo"
+                               maxlength="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descricao">Descrição Detalhada *</label>
+                        <textarea id="descricao" name="descricao" rows="5" required 
+                                  placeholder="Descreva detalhadamente o problema ou solicitação"
+                                  maxlength="1000"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoria">Categoria *</label>
+                            <select id="categoria" name="categoria" required>
+                                <option value="">Selecione...</option>
+                                <option value="Hardware">🖥️ Hardware</option>
+                                <option value="Software">💿 Software</option>
+                                <option value="Rede">🌐 Rede</option>
+                                <option value="Email">📧 Email</option>
+                                <option value="Impressora">🖨️ Impressora</option>
+                                <option value="Acesso">🔑 Acesso/Permissão</option>
+                                <option value="Outro">❓ Outro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prioridade">Prioridade *</label>
+                            <select id="prioridade" name="prioridade" required>
+                                <option value="">Selecione...</option>
+                                <option value="Baixa">🟢 Baixa</option>
+                                <option value="Média">🟡 Média</option>
+                                <option value="Alta">🟠 Alta</option>
+                                <option value="Crítica">🔴 Crítica</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>👤 Dados do Solicitante</h3>
+                    
+                    <div class="form-group">
+                        <label for="aberto_por">Nome do Solicitante *</label>
+                        <input type="text" id="aberto_por" name="aberto_por" required 
+                               placeholder="Nome completo"
+                               maxlength="100">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email_contato">E-mail para contato</label>
+                            <input type="email" id="email_contato" name="email_contato" 
+                                   placeholder="email@exemplo.com"
+                                   maxlength="100">
+                            <small>Opcional, mas recomendado</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefone_contato">Telefone para contato</label>
+                            <input type="tel" id="telefone_contato" name="telefone_contato" 
+                                   placeholder="(11) 99999-9999"
+                                   maxlength="20">
+                            <small>Opcional</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">📨 Abrir Chamado</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">↩️ Cancelar</a>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        // Máscara para telefone
+        document.getElementById('telefone_contato').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 10) {
+                value = value.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            } else if (value.length > 5) {
+                value = value.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+            } else if (value.length > 2) {
+                value = value.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+            }
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

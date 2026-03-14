@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Chamados - Helpdesk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>{{ titulo if titulo else '📋 Lista de Chamados' }}</h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Início</a></li>
+                    <li><a href="{{ url_for('listar_chamados') }}" class="active">Ver Chamados</a></li>
+                    <li><a href="{{ url_for('abrir_chamado') }}">Abrir Chamado</a></li>
+                    <li><a href="{{ url_for('estatisticas') }}">Estatísticas</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="filtros-avancados">
+                <h3>🔍 Filtros</h3>
+                <form method="GET" class="filtros-form">
+                    <div class="filtros-grid">
+                        <div class="form-group">
+                            <label for="status">Status:</label>
+                            <select id="status" name="status">
+                                <option value="">Todos</option>
+                                <option value="Aberto" {% if filtro_status == 'Aberto' %}selected{% endif %}>Aberto</option>
+                                <option value="Em Andamento" {% if filtro_status == 'Em Andamento' %}selected{% endif %}>Em Andamento</option>
+                                <option value="Aguardando" {% if filtro_status == 'Aguardando' %}selected{% endif %}>Aguardando</option>
+                                <option value="Resolvido" {% if filtro_status == 'Resolvido' %}selected{% endif %}>Resolvido</option>
+                                <option value="Fechado" {% if filtro_status == 'Fechado' %}selected{% endif %}>Fechado</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prioridade">Prioridade:</label>
+                            <select id="prioridade" name="prioridade">
+                                <option value="">Todas</option>
+                                <option value="Baixa" {% if filtro_prioridade == 'Baixa' %}selected{% endif %}>Baixa</option>
+                                <option value="Média" {% if filtro_prioridade == 'Média' %}selected{% endif %}>Média</option>
+                                <option value="Alta" {% if filtro_prioridade == 'Alta' %}selected{% endif %}>Alta</option>
+                                <option value="Crítica" {% if filtro_prioridade == 'Crítica' %}selected{% endif %}>Crítica</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="usuario">Solicitante:</label>
+                            <input type="text" id="usuario" name="usuario" 
+                                   value="{{ filtro_usuario }}" 
+                                   placeholder="Nome do solicitante">
+                        </div>
+
+                        <div class="form-group filtros-actions">
+                            <button type="submit" class="btn">Aplicar Filtros</button>
+                            <a href="{{ url_for('listar_chamados') }}" class="btn btn-secondary">Limpar</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="pesquisa-rapida">
+                <input type="text" id="pesquisa" placeholder="Pesquisar em todos os campos..." 
+                       onkeyup="filtrarChamados()">
+            </div>
+
+            {% if chamados %}
+                <div class="table-responsive">
+                    <table id="tabela-chamados">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Título</th>
+                                <th>Solicitante</th>
+                                <th>Contato</th>
+                                <th>Categoria</th>
+                                <th>Prioridade</th>
+                                <th>Status</th>
+                                <th>Data Abertura</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for chamado in chamados %}
+                            <tr class="prioridade-{{ chamado.prioridade.lower() }}">
+                                <td>#{{ chamado.id }}</td>
+                                <td>{{ chamado.titulo }}</td>
+                                <td>
+                                    <strong>{{ chamado.aberto_por }}</strong>
+                                    {% if chamado.email_contato %}
+                                        <br><small>{{ chamado.email_contato }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if chamado.telefone_contato %}
+                                        {{ chamado.telefone_contato }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ chamado.categoria }}</td>
+                                <td>
+                                    <span class="badge prioridade-{{ chamado.prioridade.lower() }}">
+                                        {{ chamado.prioridade }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge status-{{ chamado.status.lower().replace(' ', '-') }}">
+                                        {{ chamado.status }}
+                                    </span>
+                                </td>
+                                <td>{{ chamado.data_abertura[:10] }}</td>
+                                <td class="actions">
+                                    <a href="{{ url_for('detalhes_chamado', id=chamado.id) }}" 
+                                       class="btn-small" title="Ver detalhes">👁️</a>
+                                    <a href="{{ url_for('atualizar_chamado', id=chamado.id) }}" 
+                                       class="btn-small" title="Editar">✏️</a>
+                                    <a href="{{ url_for('meus_chamados', nome=chamado.aberto_por) }}" 
+                                       class="btn-small" title="Ver outros chamados deste solicitante">👤</a>
+                                    <a href="{{ url_for('excluir_chamado', id=chamado.id) }}" 
+                                       class="btn-small" title="Excluir"
+                                       onclick="return confirm('Tem certeza que deseja excluir este chamado?')">❌</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="resumo">
+                    <p>Total de chamados: <strong>{{ chamados|length }}</strong></p>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>Nenhum chamado encontrado.</p>
+                    <a href="{{ url_for('abrir_chamado') }}" class="btn">📝 Abrir Primeiro Chamado</a>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <script>
+        function filtrarChamados() {
+            const input = document.getElementById('pesquisa');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('tabela-chamados');
+            
+            if (!table) return;
+            
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+                
+                for (let j = 0; j < cells.length - 1; j++) {
+                    const cell = cells[j];
+                    if (cell) {
+                        const textValue = cell.textContent || cell.innerText;
+                        if (textValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                rows[i].style.display = found ? '' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>

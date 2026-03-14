@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Helpdesk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛠️ Sistema de Helpdesk</h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}" class="active">Início</a></li>
+                    <li><a href="{{ url_for('listar_chamados') }}">Ver Chamados</a></li>
+                    <li><a href="{{ url_for('abrir_chamado') }}">Abrir Chamado</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section class="hero">
+                <h2>Bem-vindo ao Sistema de Helpdesk</h2>
+                <p>Gerencie seus chamados de suporte de forma eficiente e organizada.</p>
+            </section>
+
+            <section class="features">
+                <div class="feature-card">
+                    <h3>📋 Abrir Chamado</h3>
+                    <p>Registre um novo chamado de suporte com todas as informações necessárias.</p>
+                    <a href="{{ url_for('abrir_chamado') }}" class="btn">Abrir Chamado</a>
+                </div>
+
+                <div class="feature-card">
+                    <h3>📊 Visualizar Chamados</h3>
+                    <p>Acompanhe todos os chamados abertos e seu status atual.</p>
+                    <a href="{{ url_for('listar_chamados') }}" class="btn">Ver Chamados</a>
+                </div>
+
+                <div class="feature-card">
+                    <h3>✏️ Atualizar Chamados</h3>
+                    <p>Atualize informações e status dos chamados existentes.</p>
+                    <a href="{{ url_for('listar_chamados') }}" class="btn">Gerenciar</a>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
