@@ -23,5 +23,3 @@ Sistema completo de gerenciamento de chamados de suporte técnico desenvolvido c
 - **Banco de Dados:** SQLite
 - **Frontend:** HTML5, CSS3, JavaScript
 - **Template Engine:** Jinja2
-
-## 📦 Estrutura do Projeto
